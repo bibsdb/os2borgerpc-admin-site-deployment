@@ -1,6 +1,6 @@
 services:
   os2borgerpc-admin:
-    image: ghcr.io/os2borgerpc/os2borgerpc-admin-site:<specific-tag>
+    image: ghcr.io/os2borgerpc/os2borgerpc-admin-site:7.0.0
     environment:
       DB_HOST: db
       DB_NAME: bpc
@@ -31,5 +31,27 @@ services:
       # This particular line makes it both skip the connection to the Cicero server AND the validation of the username/password
       # For that reason, depending on what you're testing, you might want to comment out this line
       CITIZEN_LOGIN_API_VALIDATOR: system.utils.always_validate_citizen
+    volumes:
+      - admin-media:/media
+    depends_on:
+      - db
+    ports:
+      - 9999:9999
+      - 8080:8080
+    stdin_open: true
+    tty: true
+    privileged: true
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+        # NOTE: These values are only used in the local development
+        # environment, so it's not particularly important that
+        # they're secure
+        POSTGRES_USER: bpc
+        POSTGRES_PASSWORD: bpc
+    volumes:
+        - postgres-data:/var/lib/postgresql/data
 volumes:
-  admin-media:/media
+    admin-media:
+    postgres-data:
